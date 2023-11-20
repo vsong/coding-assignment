@@ -5,7 +5,10 @@ import hashlib
 
 app = Flask(__name__)
 limiter = Limiter(
-    app, get_remote_address, default_limits=["2 per second"]
+    key_func=get_remote_address, 
+    app=app, 
+    default_limits=["2 per second"], 
+    storage_uri="memory://"
 )
 
 class URLRepository:
