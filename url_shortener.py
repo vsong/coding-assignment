@@ -1,7 +1,15 @@
 from flask import Flask, jsonify, request
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import hashlib
 
 app = Flask(__name__)
+limiter = Limiter(
+    key_func=get_remote_address, 
+    app=app, 
+    default_limits=["2 per second"], 
+    storage_uri="memory://"
+)
 
 class URLRepository:
     def __init__(self):
@@ -20,6 +28,7 @@ def generate_short_url(long_url):
     hex_dig = hash_object.hexdigest()
     return hex_dig[:8]
 
+@limiter.limit("2 per second")
 @app.route('/encrypt', methods=['POST'])
 def encrypt():
     data = request.get_json()
